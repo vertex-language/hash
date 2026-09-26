@@ -21,10 +21,10 @@ Collection of non-cryptographic hash functions, checksums, and streaming digest 
 
 ## Quick Start
 
-Run any entry point with:
+Run the test suite in `cmd/` directly with `vsc run`:
 
 ```bash
-vsc run main.vs
+vsc run check
 ```
 
 ### CRC-32 (`hash/crc32`)
