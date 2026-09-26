@@ -1,10 +1,10 @@
 package main
 
-import crc32
-import crc64
-import adler32
-import fnv
-import xxh3
+import "hash/crc32"
+import "hash/crc64"
+import "hash/adler32"
+import "hash/fnv"
+import "hash/xxh3"
 
 var checkCount: int32 = 0
 var failureCount: int32 = 0
