@@ -3,7 +3,7 @@ package adler32
 let modAdler: uint32 = 65521
 let nmax: int = 5552
 
-func stringBytes(_ s: string) -> [uint8] {
+func stringBytes(s: string) -> [uint8] {
     var bytes: [uint8] = []
     for b in s.utf8 {
         bytes.append(b)
@@ -29,13 +29,13 @@ public struct Digest {
         self.s2 = 0
     }
 
-    public mutating func Write(_ data: [uint8]) {
+    public mutating func Write(data: [uint8]) {
         let res = Update(self.Sum32(), data)
         self.s1 = res & 0xFFFF
         self.s2 = (res >> 16) & 0xFFFF
     }
 
-    public mutating func WriteString(_ s: string) {
+    public mutating func WriteString(s: string) {
         self.Write(stringBytes(s))
     }
 
@@ -43,7 +43,7 @@ public struct Digest {
         return (self.s2 << 16) | self.s1
     }
 
-    public func Sum(_ b: [uint8] = []) -> [uint8] {
+    public func Sum(b: [uint8] = []) -> [uint8] {
         var res = b
         let s = self.Sum32()
         res.append(uint8((s >> 24) & 0xFF))
@@ -60,7 +60,7 @@ public func New() -> Digest {
 }
 
 /// Update updates the running Adler-32 checksum with data.
-public func Update(_ d: uint32, _ data: [uint8]) -> uint32 {
+public func Update(d: uint32, data: [uint8]) -> uint32 {
     var s1 = d & 0xFFFF
     var s2 = (d >> 16) & 0xFFFF
 
@@ -80,11 +80,11 @@ public func Update(_ d: uint32, _ data: [uint8]) -> uint32 {
 }
 
 /// Checksum returns the Adler-32 checksum of data.
-public func Checksum(_ data: [uint8]) -> uint32 {
+public func Checksum(data: [uint8]) -> uint32 {
     return Update(1, data)
 }
 
 /// ChecksumString returns the Adler-32 checksum of a string.
-public func ChecksumString(_ s: string) -> uint32 {
+public func ChecksumString(s: string) -> uint32 {
     return Checksum(stringBytes(s))
 }

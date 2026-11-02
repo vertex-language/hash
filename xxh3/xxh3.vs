@@ -25,7 +25,7 @@ let defaultSecret: [uint8] = [
     0x39, 0x2b, 0xb8, 0xef, 0x87, 0x65, 0x90, 0x3a, 0x77, 0x53, 0x54, 0x40, 0x32, 0x8e, 0xdc, 0x64
 ]
 
-func stringBytes(_ s: string) -> [uint8] {
+func stringBytes(s: string) -> [uint8] {
     var bytes: [uint8] = []
     for b in s.utf8 {
         bytes.append(b)
@@ -33,14 +33,14 @@ func stringBytes(_ s: string) -> [uint8] {
     return bytes
 }
 
-func readLE32(_ data: [uint8], _ offset: int) -> uint32 {
+func readLE32(data: [uint8], offset: int) -> uint32 {
     return uint32(data[offset]) |
           (uint32(data[offset + 1]) << 8) |
           (uint32(data[offset + 2]) << 16) |
           (uint32(data[offset + 3]) << 24)
 }
 
-func readLE64(_ data: [uint8], _ offset: int) -> uint64 {
+func readLE64(data: [uint8], offset: int) -> uint64 {
     return uint64(data[offset]) |
           (uint64(data[offset + 1]) << 8) |
           (uint64(data[offset + 2]) << 16) |
@@ -51,7 +51,7 @@ func readLE64(_ data: [uint8], _ offset: int) -> uint64 {
           (uint64(data[offset + 7]) << 56)
 }
 
-func mult64to128(_ a: uint64, _ b: uint64) -> (low: uint64, high: uint64) {
+func mult64to128(a: uint64, b: uint64) -> (low: uint64, high: uint64) {
     let aLo = a & 0xFFFFFFFF
     let aHi = a >> 32
     let bLo = b & 0xFFFFFFFF
@@ -71,7 +71,7 @@ func mult64to128(_ a: uint64, _ b: uint64) -> (low: uint64, high: uint64) {
     return (low: lo, high: hi)
 }
 
-func xxh3_avalanche(_ h: uint64) -> uint64 {
+func xxh3_avalanche(h: uint64) -> uint64 {
     var x = h
     x ^= x >> 37
     x = x &* 0x165667B19E3779F9
@@ -79,7 +79,7 @@ func xxh3_avalanche(_ h: uint64) -> uint64 {
     return x
 }
 
-func xxh64_avalanche(_ h: uint64) -> uint64 {
+func xxh64_avalanche(h: uint64) -> uint64 {
     var x = h
     x ^= x >> 33
     x = x &* prime64_2
@@ -89,7 +89,7 @@ func xxh64_avalanche(_ h: uint64) -> uint64 {
     return x
 }
 
-func xxh3_rrmxmx(_ h: uint64, _ len: uint64) -> uint64 {
+func xxh3_rrmxmx(h: uint64, len: uint64) -> uint64 {
     let rot49 = (h << 49) | (h >> 15)
     let rot24 = (h << 24) | (h >> 40)
     var x = h ^ (rot49 ^ rot24)
@@ -100,7 +100,7 @@ func xxh3_rrmxmx(_ h: uint64, _ len: uint64) -> uint64 {
     return x
 }
 
-func mix16Bytes(_ input: [uint8], _ inOff: int, _ sec: [uint8], _ secOff: int, _ seed: uint64) -> uint64 {
+func mix16Bytes(input: [uint8], inOff: int, sec: [uint8], secOff: int, seed: uint64) -> uint64 {
     let in1 = readLE64(input, inOff)
     let in2 = readLE64(input, inOff + 8)
     let sec1 = readLE64(sec, secOff)
@@ -113,7 +113,7 @@ func mix16Bytes(_ input: [uint8], _ inOff: int, _ sec: [uint8], _ secOff: int, _
 }
 
 /// Computes 64-bit XXH3 hash of input data.
-public func Hash64(_ data: [uint8], seed: uint64 = 0) -> uint64 {
+public func Hash64(data: [uint8], seed: uint64 = 0) -> uint64 {
     let len = data.count
     let sec = defaultSecret
 
@@ -235,19 +235,19 @@ public func Hash64(_ data: [uint8], seed: uint64 = 0) -> uint64 {
 }
 
 /// Computes 64-bit XXH3 hash of a string.
-public func Hash64String(_ s: string, seed: uint64 = 0) -> uint64 {
+public func Hash64String(s: string, seed: uint64 = 0) -> uint64 {
     return Hash64(stringBytes(s), seed: seed)
 }
 
 /// Computes 128-bit XXH3 hash of input data.
-public func Hash128(_ data: [uint8], seed: uint64 = 0) -> (low: uint64, high: uint64) {
+public func Hash128(data: [uint8], seed: uint64 = 0) -> (low: uint64, high: uint64) {
     let low = Hash64(data, seed: seed)
     let high = Hash64(data, seed: ~seed &+ prime64_1)
     return (low: low, high: high)
 }
 
 /// Computes 128-bit XXH3 hash of a string.
-public func Hash128String(_ s: string, seed: uint64 = 0) -> (low: uint64, high: uint64) {
+public func Hash128String(s: string, seed: uint64 = 0) -> (low: uint64, high: uint64) {
     return Hash128(stringBytes(s), seed: seed)
 }
 
@@ -268,13 +268,13 @@ public struct Digest64 {
         self.buffer = []
     }
 
-    public mutating func Write(_ data: [uint8]) {
+    public mutating func Write(data: [uint8]) {
         for b in data {
             self.buffer.append(b)
         }
     }
 
-    public mutating func WriteString(_ s: string) {
+    public mutating func WriteString(s: string) {
         self.Write(stringBytes(s))
     }
 
@@ -282,7 +282,7 @@ public struct Digest64 {
         return Hash64(self.buffer, seed: self.seed)
     }
 
-    public func Sum(_ b: [uint8] = []) -> [uint8] {
+    public func Sum(b: [uint8] = []) -> [uint8] {
         var res = b
         let s = self.Sum64()
         res.append(uint8((s >> 56) & 0xFF))

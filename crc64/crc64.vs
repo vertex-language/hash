@@ -6,7 +6,7 @@ public let ISO: uint64 = 0xD800000000000000
 // ECMA-182 polynomial.
 public let ECMA: uint64 = 0xC96C5795D7870F42
 
-func stringBytes(_ s: string) -> [uint8] {
+func stringBytes(s: string) -> [uint8] {
     var bytes: [uint8] = []
     for b in s.utf8 {
         bytes.append(b)
@@ -23,7 +23,7 @@ public struct Table {
     }
 
     /// Makes a 256-word table using the specified polynomial.
-    public static func Make(_ poly: uint64) -> Table {
+    public static func Make(poly: uint64) -> Table {
         var tab = [uint64](repeating: 0, count: 256)
         var i: uint64 = 0
         while i < 256 {
@@ -64,11 +64,11 @@ public struct Digest {
         self.crc = 0
     }
 
-    public mutating func Write(_ data: [uint8]) {
+    public mutating func Write(data: [uint8]) {
         self.crc = Update(self.crc, self.table, data)
     }
 
-    public mutating func WriteString(_ s: string) {
+    public mutating func WriteString(s: string) {
         self.Write(stringBytes(s))
     }
 
@@ -76,7 +76,7 @@ public struct Digest {
         return self.crc
     }
 
-    public func Sum(_ b: [uint8] = []) -> [uint8] {
+    public func Sum(b: [uint8] = []) -> [uint8] {
         var res = b
         let s = self.crc
         res.append(uint8((s >> 56) & 0xFF))
@@ -107,7 +107,7 @@ public func NewECMA() -> Digest {
 }
 
 /// Update updates the running crc with data using the given table.
-public func Update(_ crc: uint64, _ table: Table, _ data: [uint8]) -> uint64 {
+public func Update(crc: uint64, table: Table, data: [uint8]) -> uint64 {
     var c = ~crc
     var i = 0
     while i < data.count {
@@ -119,21 +119,21 @@ public func Update(_ crc: uint64, _ table: Table, _ data: [uint8]) -> uint64 {
 }
 
 /// Checksum returns the CRC-64 checksum of data using the specified table.
-public func Checksum(_ data: [uint8], table: Table = Table.ISOTable) -> uint64 {
+public func Checksum(data: [uint8], table: Table = Table.ISOTable) -> uint64 {
     return Update(0, table, data)
 }
 
 /// ChecksumISO returns the CRC-64 checksum of data using the ISO table.
-public func ChecksumISO(_ data: [uint8]) -> uint64 {
+public func ChecksumISO(data: [uint8]) -> uint64 {
     return Checksum(data, table: Table.ISOTable)
 }
 
 /// ChecksumECMA returns the CRC-64 checksum of data using the ECMA table.
-public func ChecksumECMA(_ data: [uint8]) -> uint64 {
+public func ChecksumECMA(data: [uint8]) -> uint64 {
     return Checksum(data, table: Table.ECMATable)
 }
 
 /// ChecksumString returns the CRC-64 checksum of a string using the specified table.
-public func ChecksumString(_ s: string, table: Table = Table.ISOTable) -> uint64 {
+public func ChecksumString(s: string, table: Table = Table.ISOTable) -> uint64 {
     return Checksum(stringBytes(s), table: table)
 }

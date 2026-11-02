@@ -9,7 +9,7 @@ public let Castagnoli: uint32 = 0x82F63B78
 // Koopman polynomial.
 public let Koopman: uint32 = 0xEB31D82E
 
-func stringBytes(_ s: string) -> [uint8] {
+func stringBytes(s: string) -> [uint8] {
     var bytes: [uint8] = []
     for b in s.utf8 {
         bytes.append(b)
@@ -26,7 +26,7 @@ public struct Table {
     }
 
     /// Makes a 256-word table using the specified polynomial.
-    public static func Make(_ poly: uint32) -> Table {
+    public static func Make(poly: uint32) -> Table {
         var tab = [uint32](repeating: 0, count: 256)
         var i: uint32 = 0
         while i < 256 {
@@ -68,11 +68,11 @@ public struct Digest {
         self.crc = 0
     }
 
-    public mutating func Write(_ data: [uint8]) {
+    public mutating func Write(data: [uint8]) {
         self.crc = Update(self.crc, self.table, data)
     }
 
-    public mutating func WriteString(_ s: string) {
+    public mutating func WriteString(s: string) {
         self.Write(stringBytes(s))
     }
 
@@ -80,7 +80,7 @@ public struct Digest {
         return self.crc
     }
 
-    public func Sum(_ b: [uint8] = []) -> [uint8] {
+    public func Sum(b: [uint8] = []) -> [uint8] {
         var res = b
         let s = self.crc
         res.append(uint8((s >> 24) & 0xFF))
@@ -107,7 +107,7 @@ public func NewCastagnoli() -> Digest {
 }
 
 /// Update updates the running crc with data using the given table.
-public func Update(_ crc: uint32, _ table: Table, _ data: [uint8]) -> uint32 {
+public func Update(crc: uint32, table: Table, data: [uint8]) -> uint32 {
     var c = ~crc
     var i = 0
     while i < data.count {
@@ -119,26 +119,26 @@ public func Update(_ crc: uint32, _ table: Table, _ data: [uint8]) -> uint32 {
 }
 
 /// Checksum returns the CRC-32 checksum of data using the specified table.
-public func Checksum(_ data: [uint8], table: Table = Table.IEEETable) -> uint32 {
+public func Checksum(data: [uint8], table: Table = Table.IEEETable) -> uint32 {
     return Update(0, table, data)
 }
 
 /// ChecksumIEEE returns the CRC-32 checksum of data using the IEEE table.
-public func ChecksumIEEE(_ data: [uint8]) -> uint32 {
+public func ChecksumIEEE(data: [uint8]) -> uint32 {
     return Checksum(data, table: Table.IEEETable)
 }
 
 /// ChecksumCastagnoli returns the CRC-32C checksum of data using the Castagnoli table.
-public func ChecksumCastagnoli(_ data: [uint8]) -> uint32 {
+public func ChecksumCastagnoli(data: [uint8]) -> uint32 {
     return Checksum(data, table: Table.CastagnoliTable)
 }
 
 /// ChecksumString returns the CRC-32 checksum of a string using the specified table.
-public func ChecksumString(_ s: string, table: Table = Table.IEEETable) -> uint32 {
+public func ChecksumString(s: string, table: Table = Table.IEEETable) -> uint32 {
     return Checksum(stringBytes(s), table: table)
 }
 
 /// ChecksumCastagnoliString returns the CRC-32C checksum of a string using Castagnoli table.
-public func ChecksumCastagnoliString(_ s: string) -> uint32 {
+public func ChecksumCastagnoliString(s: string) -> uint32 {
     return Checksum(stringBytes(s), table: Table.CastagnoliTable)
 }
